@@ -1,10 +1,11 @@
 {
-  "spec_dir": "spec",
+  "spec_dir": "src/tests",
   "spec_files": [
-    "../**/tests/*[s]pec.ts"
+    "**/*[sS]pec.ts"
   ],
   "helpers": [
-    "helpers/**/*.js"
+    "helpers/**/*.js",
+    "helpers/**/*.ts"
   ],
   "reporters": [
     {
@@ -14,6 +15,6 @@
       }
     }
   ],
-  "stopSpecOnExpectationFailure": false,
-  "random": true
+  "stopSpecOnExpectationFailure": true,
+  "random": false
 }

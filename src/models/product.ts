@@ -1,9 +1,10 @@
 import client from '../database';
 
 export type Product = {
-  id: number;
+  id?: number;
   name: string;
   price: number;
+  created_at?: Date;
 
 };
 
@@ -33,7 +34,10 @@ export class ProductStore {
 
       conn.release();
 
-      return result.rows[0];
+      return {
+        ...result.rows[0],
+        price: Number(result.rows[0].price) // Convert price to number
+      };
     } catch (err) {
       throw new Error(`Could not find product ${id}. Error: ${err}`);
     }
@@ -48,7 +52,10 @@ export class ProductStore {
 
       conn.release();
 
-      return result.rows[0];
+      return {
+        ...result.rows[0],
+        price: Number(result.rows[0].price) // Convert price to number
+      };
     } catch (err) {
       throw new Error(`Could not add new product. Error: ${err}`);
     }
