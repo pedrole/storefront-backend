@@ -1,7 +1,7 @@
 import client from '../database';
 
 export type Order = {
-  id: number;
+  id?: number;
   user_id: number;
   status: string;
 };
@@ -17,6 +17,19 @@ export class OrderStore {
       return result.rows[0];
     } catch (err) {
       throw new Error(`Could not get current order for user ${user_id}. Error: ${err}`);
+    }
+  }
+
+  async create(o: Order): Promise<Order> {
+    try {
+      const conn = await client.connect();
+      const sql = 'INSERT INTO orders (user_id, status) VALUES($1, $2) RETURNING *';
+      const result = await conn.query(sql, [o.user_id, o.status]);
+      const order = result.rows[0];
+      conn.release();
+      return order;
+    } catch (err) {
+      throw new Error(`Could not add new order. Error: ${err}`);
     }
   }
 }

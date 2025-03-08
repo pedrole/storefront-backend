@@ -4,12 +4,17 @@ import client from '../../database';
 const store = new OrderStore();
 
 describe('Order Model', () => {
+  let userId: number;
   beforeAll(async () => {
     const conn = await client.connect();
     await conn.query('DELETE FROM orders');
     await conn.query('DELETE FROM users');
-    await conn.query('INSERT INTO users (first_name, last_name, password) VALUES ($1, $2, $3)', ['John', 'Doe', 'password123']);
-    await conn.query('INSERT INTO orders (user_id, status) VALUES ($1, $2)', [1, 'active']);
+    const userResult = await conn.query(
+      'INSERT INTO users (first_name, last_name, password) VALUES ($1, $2, $3) RETURNING id',
+      ['John', 'Doe', 'password123']
+    );
+    userId = userResult.rows[0].id;
+    await conn.query('INSERT INTO orders (user_id, status) VALUES ($1, $2)', [userId, 'active']);
     conn.release();
   });
 
@@ -18,10 +23,10 @@ describe('Order Model', () => {
   });
 
   it('currentOrder method should return the current order for a user', async () => {
-    const result = await store.currentOrder(1);
+    const result = await store.currentOrder(userId);
     expect(result).toEqual(jasmine.objectContaining({
       id: result.id,
-      user_id: 1,
+      user_id: userId,
       status: 'active'
     }));
   });

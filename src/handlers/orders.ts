@@ -14,8 +14,22 @@ const currentOrder = async (req: Request, res: Response) => {
   }
 };
 
+const createOrder = async (req: Request, res: Response) => {
+  try {
+    const order = {
+      user_id: req.body.user_id,
+      status: req.body.status
+    };
+    const newOrder = await store.create(order);
+    res.json(newOrder);
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
+};
+
 const orderRoutes = (app: express.Application) => {
   app.get('/orders/current/:user_id', verifyAuthToken, currentOrder);
+  app.post('/orders', verifyAuthToken, createOrder);
 };
 
 export default orderRoutes;

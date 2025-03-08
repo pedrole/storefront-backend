@@ -1,8 +1,15 @@
 import { ProductStore } from "../../models/product";
+import client from "../../database";
 
 const store = new ProductStore();
+let productId: number;
 
 describe("Product Model", () => {
+  beforeAll(async () => {
+    const conn = await client.connect();
+    await conn.query("DELETE FROM products");
+    conn.release();
+  });
   it("should have an index method", () => {
     expect(store.index).toBeDefined();
   });
@@ -24,10 +31,11 @@ describe("Product Model", () => {
       name: "Test Product",
       price: 100,
     });
+    productId = result.id as number;
 
 
     expect(result).toEqual({
-      id: result.id,
+      id: productId,
       name: "Test Product",
       price: parseFloat(100 as unknown as string),
       created_at: result.created_at, //
@@ -40,10 +48,10 @@ describe("Product Model", () => {
   });
 
   it("show method should return the correct product", async () => {
-    const result = await store.show("1");
+    const result = await store.show(productId.toString());
     expect(result).toEqual(
       jasmine.objectContaining({
-        id: 1,
+        id: productId,
         name: "Test Product",
         price: 100,
       })
@@ -51,7 +59,7 @@ describe("Product Model", () => {
   });
 
   it("delete method should remove the product", async () => {
-    await store.delete("1");
+    await store.delete(productId.toString());
     const result = await store.index();
 
     expect(result).toEqual([]);
