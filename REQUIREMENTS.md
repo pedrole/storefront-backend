@@ -11,8 +11,6 @@ These are the notes from a meeting with the frontend developer that describe wha
   - GET `/products/:id`
 - Create [token required]
   - POST `/products`
-- [OPTIONAL] Top 5 most popular products
-- [OPTIONAL] Products by category (args: product category)
 
 
 #### Users
@@ -27,19 +25,19 @@ These are the notes from a meeting with the frontend developer that describe wha
 - Current Order by user (args: user id)[token required]
   - GET `/orders/current/:user_id`
 
-- [OPTIONAL] Completed Orders by user (args: user id)[token required]
+
 
 ## Data Shapes
 #### Product
 -  id
 - name
 - price
-- [OPTIONAL] category
+
 
 #### User
 - id
-- firstName
-- lastName
+- first_name
+- last_name
 - password
 
 #### Orders
