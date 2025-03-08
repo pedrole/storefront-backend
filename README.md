@@ -27,6 +27,7 @@ POSTGRES_PASSWORD=your_secret_password
 BCRYPT_PASSWORD=your_secret_salt
 SALT_ROUNDS=10
 TOKEN_SECRET=your_jwt_secret
+ENV=dev
 ```
 
 ### Set up the database
