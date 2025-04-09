@@ -30,6 +30,7 @@ describe("Product Model", () => {
     const result = await store.create({
       name: "Test Product",
       price: 100,
+      image: "test_image.jpg",
     });
     productId = result.id as number;
 
@@ -38,6 +39,7 @@ describe("Product Model", () => {
       id: productId,
       name: "Test Product",
       price: parseFloat(100 as unknown as string),
+      image: "test_image.jpg",
       created_at: result.created_at, //
     });
   });
