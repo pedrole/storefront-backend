@@ -28,7 +28,7 @@ const create = async (req: Request, res: Response) => {
       price: req.body.price,
       image: req.body.image,
     };
-    console.log("Product data:", product);
+    
     const newProduct = await store.create(product);
     res.json(newProduct);
   } catch (err) {
