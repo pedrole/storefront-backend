@@ -4,6 +4,7 @@ export type Product = {
   id?: number;
   name: string;
   price: number;
+  image?: string;
   created_at?: Date;
 
 };
@@ -46,9 +47,9 @@ export class ProductStore {
   async create(p: Product): Promise<Product> {
     try {
       const conn = await client.connect();
-      const sql = 'INSERT INTO products (name, price) VALUES($1, $2) RETURNING *';
+      const sql = 'INSERT INTO products (name, price, image) VALUES($1, $2, $3) RETURNING *';
 
-      const result = await conn.query(sql, [p.name, p.price]);
+      const result = await conn.query(sql, [p.name, p.price, p.image]);
 
       conn.release();
 
