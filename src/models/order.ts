@@ -45,23 +45,26 @@ export class OrderStore {
   ): Promise<OrderProduct> {
     // Check if product already in the order
     const conn = await client.connect();
-    const exists = await conn.query(
-      "SELECT * FROM order_products WHERE order_id = $1 AND product_id = $2",
-      [orderId, productId]
-    );
+    try {
+      const exists = await conn.query(
+        "SELECT * FROM order_products WHERE order_id = $1 AND product_id = $2",
+        [orderId, productId]
+      );
 
-    if (exists.rows.length) {
-      await conn.query(
-        "UPDATE order_products SET quantity = quantity + $1 WHERE order_id = $2 AND product_id = $3",
-        [quantity, orderId, productId]
-      );
-    } else {
-      await conn.query(
-        "INSERT INTO order_products (order_id, product_id, quantity) VALUES ($1, $2, $3)",
-        [orderId, productId, quantity]
-      );
+      if (exists.rows.length) {
+        await conn.query(
+          "UPDATE order_products SET quantity = quantity + $1 WHERE order_id = $2 AND product_id = $3",
+          [quantity, orderId, productId]
+        );
+      } else {
+        await conn.query(
+          "INSERT INTO order_products (order_id, product_id, quantity) VALUES ($1, $2, $3)",
+          [orderId, productId, quantity]
+        );
+      }
+    } finally {
+      conn.release();
     }
-    conn.release();
 
     return {
       order_id: orderId,
