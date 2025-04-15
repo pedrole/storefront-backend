@@ -22,12 +22,11 @@ export class OrderStore {
       const result = await conn.query(sql, [user_id, "active"]);
       conn.release();
       let order = result.rows[0];
-      if( !order ) {
-        order =  await this.create({
+      if (!order) {
+        order = await this.create({
           user_id,
           status: "active",
         });
-
       }
       return order;
     } catch (err) {
@@ -62,15 +61,20 @@ export class OrderStore {
           [orderId, productId, quantity]
         );
       }
+      // Retrieve the updated cumulative quantity
+      const result = await conn.query(
+        "SELECT quantity FROM order_products WHERE order_id = $1 AND product_id = $2",
+        [orderId, productId]
+      );
+      const cumulativeQuantity = result.rows[0].quantity;
+      return {
+        order_id: orderId,
+        product_id: productId,
+        quantity: cumulativeQuantity,
+      };
     } finally {
       conn.release();
     }
-
-    return {
-      order_id: orderId,
-      product_id: productId,
-      quantity,
-    };
   }
 
   async create(o: Order): Promise<Order> {
