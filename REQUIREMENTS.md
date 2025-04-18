@@ -24,6 +24,8 @@ These are the notes from a meeting with the frontend developer that describe wha
 #### Orders
 - Current Order by user (args: user id)[token required]
   - GET `/orders/current/:user_id`
+- Add product to current order [token required]
+  - POST `/orders/add-product`
 
 
 
@@ -47,6 +49,11 @@ These are the notes from a meeting with the frontend developer that describe wha
 - user_id
 - status of order (active or complete)
 
+#### OrderProduct
+- order_id
+- product_id
+- status
+
 ## DB Schema
 
 ```
@@ -54,6 +61,7 @@ products {
 	id serial pk
 	name varchar def(255)
 	price decimal
+  image varchar def(255)
 }
 
 users {
