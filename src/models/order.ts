@@ -42,9 +42,12 @@ export class OrderStore {
     productId: number,
     quantity: number
   ): Promise<OrderProduct> {
-    // Check if product already in the order
     const conn = await client.connect();
     try {
+      // Begin transaction
+      await conn.query("BEGIN");
+
+      // Check if product already in the order
       const exists = await conn.query(
         "SELECT * FROM order_products WHERE order_id = $1 AND product_id = $2",
         [orderId, productId]
@@ -61,17 +64,26 @@ export class OrderStore {
           [orderId, productId, quantity]
         );
       }
+
       // Retrieve the updated cumulative quantity
       const result = await conn.query(
         "SELECT quantity FROM order_products WHERE order_id = $1 AND product_id = $2",
         [orderId, productId]
       );
+
+      // Commit transaction
+      await conn.query("COMMIT");
+
       const cumulativeQuantity = result.rows[0].quantity;
       return {
         order_id: orderId,
         product_id: productId,
         quantity: cumulativeQuantity,
       };
+    } catch (err) {
+      // Rollback transaction in case of error
+      await conn.query("ROLLBACK");
+      throw new Error(`Could not add product to order. Error: ${err}`);
     } finally {
       conn.release();
     }
