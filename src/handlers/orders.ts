@@ -20,8 +20,12 @@ const addProductToOrder = async (req: Request, res: Response) => {
 
     const productId = parseInt(req.body.product_id);
     const quantity = parseInt(req.body.quantity);
+    const user = req.user;
 
-    const activeOrder : Order = await store.currentOrder(req.user.id);
+    if (user.id === undefined) {
+      throw new Error('User ID is undefined');
+    }
+    const activeOrder: Order = await store.currentOrder(user.id);
     if (!activeOrder.id) {
       throw new Error('Active order ID is undefined');
     }
