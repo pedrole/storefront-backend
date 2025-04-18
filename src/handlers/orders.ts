@@ -16,10 +16,16 @@ const currentOrder = async (req: Request, res: Response) => {
 
 const addProductToOrder = async (req: Request, res: Response) => {
   try {
-    console.log('user_id', req.user.id);
+
 
     const productId = parseInt(req.body.product_id);
     const quantity = parseInt(req.body.quantity);
+    if (isNaN(quantity) || !isFinite(quantity)) {
+      throw new Error('Invalid quantity: must be a valid number');
+    }
+    if (isNaN(productId)) {
+      throw new Error('Invalid product ID: must be a valid number');
+    }
     const user = req.user;
 
     if (user.id === undefined) {
