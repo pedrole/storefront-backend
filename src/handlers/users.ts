@@ -23,6 +23,28 @@ const createUser = async (req: Request, res: Response) => {
   }
 };
 
+// login
+const login = async (req: Request, res: Response) => {
+  try {
+    const user: User = {
+      first_name: req.body.firstname,
+      last_name: req.body.lastname,
+      password: req.body.password
+    };
+    console.log(user);
+
+    const loggedInUser = await store.authenticate(user.first_name, user.last_name, user.password);
+    if (!loggedInUser) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    const token = jwt.sign({ user: loggedInUser }, process.env.TOKEN_SECRET as string);
+    res.json({ id: loggedInUser.id, token });
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
+};
+
+
 
 const index = async (_req: Request, res: Response) => {
   try {
@@ -46,6 +68,7 @@ const userRoutes = (app: express.Application) => {
   app.get('/users', verifyAuthToken, index);
   app.post('/users', createUser);
   app.get('/users/:id', verifyAuthToken, show);
+  app.post('/users/login', login);
 };
 
 export default userRoutes;
