@@ -16,8 +16,9 @@ export type OrderProduct = {
 export class OrderStore {
   // get current order by user
   async currentOrder(user_id: number): Promise<Order> {
+    let conn;
     try {
-      const conn = await client.connect();
+       conn = await client.connect();
       const sql = "SELECT * FROM orders WHERE user_id=($1) AND status=($2)";
       const result = await conn.query(sql, [user_id, "active"]);
       let order = result.rows[0];
@@ -34,7 +35,7 @@ export class OrderStore {
       const productsResult = await conn.query(productsSql, [order.id]);
 
 
-      conn.release();
+
       return {
         ...order,
         products: productsResult.rows
@@ -43,6 +44,8 @@ export class OrderStore {
       throw new Error(
         `Could not get current order for user ${user_id}. Error: ${err}`
       );
+    } finally {
+      if (conn) conn.release();
     }
   }
 
