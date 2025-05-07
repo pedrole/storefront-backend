@@ -20,7 +20,6 @@ export class OrderStore {
       const conn = await client.connect();
       const sql = "SELECT * FROM orders WHERE user_id=($1) AND status=($2)";
       const result = await conn.query(sql, [user_id, "active"]);
-      conn.release();
       let order = result.rows[0];
       if (!order) {
         order = await this.create({
@@ -28,7 +27,18 @@ export class OrderStore {
           status: "active",
         });
       }
-      return order;
+
+      // Fetch products for the order
+      const productsSql =
+        "SELECT op.product_id, p.name, p.price, op.quantity FROM order_products op JOIN products p ON op.product_id = p.id WHERE op.order_id = $1";
+      const productsResult = await conn.query(productsSql, [order.id]);
+
+
+      conn.release();
+      return {
+        ...order,
+        products: productsResult.rows
+      };
     } catch (err) {
       throw new Error(
         `Could not get current order for user ${user_id}. Error: ${err}`
