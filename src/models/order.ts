@@ -48,6 +48,52 @@ export class OrderStore {
       if (conn) conn.release();
     }
   }
+  async updateProductQuantity(orderId: number, productId: number, quantity: number): Promise<OrderProduct> {
+    const conn = await client.connect();
+    try {
+      // Begin transaction
+      await conn.query("BEGIN");
+      if (quantity <= 0) {
+        // If quantity is 0 or less, delete the product from the order
+        await conn.query(
+          "DELETE FROM order_products WHERE order_id = $1 AND product_id = $2",
+          [orderId, productId]
+        );
+      } else {
+        // Update the quantity or insert if it doesn't exist
+        const exists = await conn.query(
+          "SELECT * FROM order_products WHERE order_id = $1 AND product_id = $2",
+          [orderId, productId]
+        );
+        if (exists.rows.length) {
+          await conn.query(
+            "UPDATE order_products SET quantity = $1 WHERE order_id = $2 AND product_id = $3",
+            [quantity, orderId, productId]
+          );
+        } else {
+          await conn.query(
+            "INSERT INTO order_products (order_id, product_id, quantity) VALUES ($1, $2, $3)",
+            [orderId, productId, quantity]
+          );
+        }
+      }
+      await conn.query("COMMIT");
+
+      return {
+        order_id: orderId,
+        product_id: productId,
+        quantity: quantity,
+      };
+    } catch (err) {
+      // Rollback transaction in case of error
+      await conn.query("ROLLBACK");
+      throw new Error(
+        `Could not update product quantity in order. Error: ${err}`
+      );
+    } finally {
+      conn.release();
+    }
+  }
 
   // Add product to order
   async addProduct(
