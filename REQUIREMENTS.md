@@ -20,12 +20,18 @@ These are the notes from a meeting with the frontend developer that describe wha
   - `/users/:id`
 - Create N[token required]
   - `/users`
+- Login
+  - POST `/users/login/`
 
-#### Orders
-- Current Order by user (args: user id)[token required]
-  - GET `/orders/current/:user_id`
-- Add product to current order [token required]
-  - POST `/orders/add-product`
+### Orders
+- **Current Order by user** (args: user id) [token required]
+  `GET /orders/current/:user_id`
+- **Add product to current order** [token required]
+  `POST /orders/add-product`
+- **Update product quantity in current order** [token required]
+  `PUT /orders/update-product`
+- **Create order** [token required]
+  `POST /orders`
 
 
 
@@ -34,6 +40,7 @@ These are the notes from a meeting with the frontend developer that describe wha
 -  id
 - name
 - price
+- `image` (optional)
 
 
 #### User
@@ -42,12 +49,15 @@ These are the notes from a meeting with the frontend developer that describe wha
 - last_name
 - password
 
-#### Orders
-- id
-- id of each product in the order
-- quantity of each product in the order
-- user_id
-- status of order (active or complete)
+### Order
+- `id`
+- `user_id`
+- `status` (active or complete)
+- `products`: array of products in the order, each with:
+  - `product_id`
+  - `name`
+  - `price`
+  - `quantity`
 
 #### OrderProduct
 - order_id
@@ -84,3 +94,8 @@ order_products {
 	quantity integer(10)
 }
 ```
+
+## Notes
+
+- When updating a product's quantity in an order, if the quantity is set to 0 or less, the product will be removed from the order. The API will return a distinct response indicating removal.
+- All order modifications (add/update/remove product) are performed atomically to ensure data consistency.
