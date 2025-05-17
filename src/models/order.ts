@@ -18,7 +18,7 @@ export class OrderStore {
   async currentOrder(user_id: number): Promise<Order> {
     let conn;
     try {
-       conn = await client.connect();
+      conn = await client.connect();
       const sql = "SELECT * FROM orders WHERE user_id=($1) AND status=($2)";
       const result = await conn.query(sql, [user_id, "active"]);
       let order = result.rows[0];
@@ -34,11 +34,9 @@ export class OrderStore {
         "SELECT op.product_id, p.name, p.price, op.quantity FROM order_products op JOIN products p ON op.product_id = p.id WHERE op.order_id = $1";
       const productsResult = await conn.query(productsSql, [order.id]);
 
-
-
       return {
         ...order,
-        products: productsResult.rows
+        products: productsResult.rows,
       };
     } catch (err) {
       throw new Error(
@@ -46,6 +44,58 @@ export class OrderStore {
       );
     } finally {
       if (conn) conn.release();
+    }
+  }
+  async updateProductQuantity(
+    orderId: number,
+    productId: number,
+    quantity: number
+  ): Promise<OrderProduct  | { removed: true }> {
+    const conn = await client.connect();
+    try {
+      // Begin transaction
+      await conn.query("BEGIN");
+      if (quantity <= 0) {
+        // If quantity is 0 or less, delete the product from the order
+        await conn.query(
+          "DELETE FROM order_products WHERE order_id = $1 AND product_id = $2",
+          [orderId, productId]
+        );
+        await conn.query("COMMIT");
+        return { removed: true };
+      } else {
+        // Update the quantity or insert if it doesn't exist
+        const existingProduct = await conn.query(
+          "SELECT * FROM order_products WHERE order_id = $1 AND product_id = $2",
+          [orderId, productId]
+        );
+        if (existingProduct.rows.length) {
+          await conn.query(
+            "UPDATE order_products SET quantity = $1 WHERE order_id = $2 AND product_id = $3",
+            [quantity, orderId, productId]
+          );
+        } else {
+          await conn.query(
+            "INSERT INTO order_products (order_id, product_id, quantity) VALUES ($1, $2, $3)",
+            [orderId, productId, quantity]
+          );
+        }
+      }
+      await conn.query("COMMIT");
+
+      return {
+        order_id: orderId,
+        product_id: productId,
+        quantity: quantity,
+      };
+    } catch (err) {
+      // Rollback transaction in case of error
+      await conn.query("ROLLBACK");
+      throw new Error(
+        `Could not update product quantity in order. Error: ${err}`
+      );
+    } finally {
+      conn.release();
     }
   }
 
