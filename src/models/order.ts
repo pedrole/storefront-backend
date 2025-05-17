@@ -18,7 +18,7 @@ export class OrderStore {
   async currentOrder(user_id: number): Promise<Order> {
     let conn;
     try {
-       conn = await client.connect();
+      conn = await client.connect();
       const sql = "SELECT * FROM orders WHERE user_id=($1) AND status=($2)";
       const result = await conn.query(sql, [user_id, "active"]);
       let order = result.rows[0];
@@ -34,11 +34,9 @@ export class OrderStore {
         "SELECT op.product_id, p.name, p.price, op.quantity FROM order_products op JOIN products p ON op.product_id = p.id WHERE op.order_id = $1";
       const productsResult = await conn.query(productsSql, [order.id]);
 
-
-
       return {
         ...order,
-        products: productsResult.rows
+        products: productsResult.rows,
       };
     } catch (err) {
       throw new Error(
@@ -48,7 +46,11 @@ export class OrderStore {
       if (conn) conn.release();
     }
   }
-  async updateProductQuantity(orderId: number, productId: number, quantity: number): Promise<OrderProduct> {
+  async updateProductQuantity(
+    orderId: number,
+    productId: number,
+    quantity: number
+  ): Promise<OrderProduct  | { removed: true }> {
     const conn = await client.connect();
     try {
       // Begin transaction
@@ -59,13 +61,15 @@ export class OrderStore {
           "DELETE FROM order_products WHERE order_id = $1 AND product_id = $2",
           [orderId, productId]
         );
+        await conn.query("COMMIT");
+        return { removed: true };
       } else {
         // Update the quantity or insert if it doesn't exist
-        const exists = await conn.query(
+        const existingProduct = await conn.query(
           "SELECT * FROM order_products WHERE order_id = $1 AND product_id = $2",
           [orderId, productId]
         );
-        if (exists.rows.length) {
+        if (existingProduct.rows.length) {
           await conn.query(
             "UPDATE order_products SET quantity = $1 WHERE order_id = $2 AND product_id = $3",
             [quantity, orderId, productId]
