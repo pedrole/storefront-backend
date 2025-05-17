@@ -31,7 +31,7 @@ export class OrderStore {
 
       // Fetch products for the order
       const productsSql =
-        "SELECT op.product_id, p.name, p.price, op.quantity FROM order_products op JOIN products p ON op.product_id = p.id WHERE op.order_id = $1";
+        "SELECT op.product_id, p.name, p.price, p.image, op.quantity FROM order_products op JOIN products p ON op.product_id = p.id WHERE op.order_id = $1";
       const productsResult = await conn.query(productsSql, [order.id]);
 
       return {
