@@ -34,6 +34,18 @@ These are the notes from a meeting with the frontend developer that describe wha
   `POST /orders`
 - **Complete current order** [token required]
   - `PATCH /orders/complete-current-order`
+    - **Request Parameters**:
+      - `user_id` (integer, required): The ID of the user whose order is being completed.
+    - **Response Schema**:
+      - `order_id` (integer): The ID of the completed order.
+      - `status` (string): The updated status of the order (`complete`).
+      - `message` (string): A confirmation message.
+    - **Status Codes**:
+      - `200 OK`: The order was successfully completed.
+      - `400 Bad Request`: The request is missing required parameters or contains invalid data.
+      - `401 Unauthorized`: The user is not authenticated or lacks the required token.
+      - `404 Not Found`: The specified order or user does not exist.
+      - `409 Conflict`: The order is already completed or cannot be modified.
 
 
 
