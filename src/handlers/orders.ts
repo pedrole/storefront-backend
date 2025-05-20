@@ -19,9 +19,6 @@ const completeCurrentOrder = async (req: Request, res: Response) => {
     const user = req.user;
     if (!user?.id) throw new Error("User not authenticated");
     const order = await store.completeOrder(user.id);
-    if (!order.id) {
-      throw new Error("Order ID is undefined");
-    }
     res.json(order);
   } catch (err) {
     res.status(400).json({ error: (err as Error).message });
