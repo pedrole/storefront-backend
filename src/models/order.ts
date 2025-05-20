@@ -53,7 +53,7 @@ export class OrderStore {
       // Begin transaction
       await conn.query("BEGIN");
       // find the current active order for the user
-      const sql = "SELECT * FROM orders WHERE user_id=($1) AND status=($2)";
+      const sql = "SELECT * FROM orders WHERE user_id=($1) AND status=($2) FOR UPDATE";
       const result = await conn.query(sql, [user_id, "active"]);
       const order = result.rows[0];
       if (!order) {
