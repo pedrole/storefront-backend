@@ -46,11 +46,43 @@ export class OrderStore {
       if (conn) conn.release();
     }
   }
+
+  async completeOrder(user_id: number): Promise<Order> {
+    const conn = await client.connect();
+    try {
+      // Begin transaction
+      await conn.query("BEGIN");
+      // find the current active order for the user
+      const sql = "SELECT * FROM orders WHERE user_id=($1) AND status=($2) FOR UPDATE";
+      const result = await conn.query(sql, [user_id, "active"]);
+      const order = result.rows[0];
+      if (!order) {
+        throw new Error(`No active order found for user ${user_id}`);
+      }
+      // Update the order status to 'complete'
+      const updateSql =
+        "UPDATE orders SET status = $1 WHERE id = $2 RETURNING *";
+      const updatedResult = await conn.query(updateSql, ["complete", order.id]);
+      const updatedOrder = updatedResult.rows[0];
+      // Commit transaction
+      await conn.query("COMMIT");
+      return updatedOrder;
+    } catch (err) {
+      // Rollback transaction in case of error
+      await conn.query("ROLLBACK");
+      throw new Error(
+        `Could not complete order for user ${user_id}. Error: ${err}`
+      );
+    } finally {
+      conn.release();
+    }
+  }
+
   async updateProductQuantity(
     orderId: number,
     productId: number,
     quantity: number
-  ): Promise<OrderProduct  | { removed: true }> {
+  ): Promise<OrderProduct | { removed: true }> {
     const conn = await client.connect();
     try {
       // Begin transaction

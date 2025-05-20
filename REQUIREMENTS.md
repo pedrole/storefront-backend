@@ -23,7 +23,7 @@ These are the notes from a meeting with the frontend developer that describe wha
 - Login
   - POST `/users/login/`
 
-### Orders
+#### Orders
 - **Current Order by user** (args: user id) [token required]
   `GET /orders/current/:user_id`
 - **Add product to current order** [token required]
@@ -32,6 +32,20 @@ These are the notes from a meeting with the frontend developer that describe wha
   `PUT /orders/update-product`
 - **Create order** [token required]
   `POST /orders`
+- **Complete current order** [token required]
+  - `PATCH /orders/complete-current-order`
+    - **Request Parameters**:
+      - `user_id` (integer, required): The ID of the user whose order is being completed.
+    - **Response Schema**:
+      - `order_id` (integer): The ID of the completed order.
+      - `status` (string): The updated status of the order (`complete`).
+      - `message` (string): A confirmation message.
+    - **Status Codes**:
+      - `200 OK`: The order was successfully completed.
+      - `400 Bad Request`: The request is missing required parameters or contains invalid data.
+      - `401 Unauthorized`: The user is not authenticated or lacks the required token.
+      - `404 Not Found`: The specified order or user does not exist.
+      - `409 Conflict`: The order is already completed or cannot be modified.
 
 
 
@@ -58,6 +72,7 @@ These are the notes from a meeting with the frontend developer that describe wha
   - `name`
   - `price`
   - `quantity`
+  - `image`
 
 #### OrderProduct
 - order_id
@@ -99,3 +114,4 @@ order_products {
 
 - When updating a product's quantity in an order, if the quantity is set to 0 or less, the product will be removed from the order. The API will return a distinct response indicating removal.
 - All order modifications (add/update/remove product) are performed atomically to ensure data consistency.
+- Completing an order will set its status to `complete` and prevent further modifications to that order.
