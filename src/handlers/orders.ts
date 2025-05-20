@@ -14,6 +14,20 @@ const currentOrder = async (req: Request, res: Response) => {
   }
 };
 
+const completeCurrentOrder = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user?.id) throw new Error("User not authenticated");
+    const order = await store.completeOrder(user.id);
+    if (!order.id) {
+      throw new Error("Order ID is undefined");
+    }
+    res.json(order);
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
+};
+
 const addProductToOrder = async (req: Request, res: Response) => {
   try {
     const productId = parseInt(req.body.product_id);
@@ -87,6 +101,11 @@ const orderRoutes = (app: express.Application) => {
   app.post("/orders", verifyAuthToken, createOrder);
   app.post("/orders/add-product", verifyAuthToken, addProductToOrder);
   app.put("/orders/update-product", verifyAuthToken, updateProductQuantity);
+  app.patch(
+    "/orders/complete-current-order",
+    verifyAuthToken,
+    completeCurrentOrder
+  );
 };
 
 export default orderRoutes;

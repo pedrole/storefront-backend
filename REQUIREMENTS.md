@@ -23,7 +23,7 @@ These are the notes from a meeting with the frontend developer that describe wha
 - Login
   - POST `/users/login/`
 
-### Orders
+#### Orders
 - **Current Order by user** (args: user id) [token required]
   `GET /orders/current/:user_id`
 - **Add product to current order** [token required]
@@ -32,6 +32,8 @@ These are the notes from a meeting with the frontend developer that describe wha
   `PUT /orders/update-product`
 - **Create order** [token required]
   `POST /orders`
+- **Complete current order** [token required]
+  - `PATCH /orders/complete-current-order`
 
 
 
@@ -58,6 +60,7 @@ These are the notes from a meeting with the frontend developer that describe wha
   - `name`
   - `price`
   - `quantity`
+  - `image`
 
 #### OrderProduct
 - order_id
@@ -99,3 +102,4 @@ order_products {
 
 - When updating a product's quantity in an order, if the quantity is set to 0 or less, the product will be removed from the order. The API will return a distinct response indicating removal.
 - All order modifications (add/update/remove product) are performed atomically to ensure data consistency.
+- Completing an order will set its status to `complete` and prevent further modifications to that order.
