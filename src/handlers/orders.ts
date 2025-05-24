@@ -21,10 +21,15 @@ const completeCurrentOrder = async (req: Request, res: Response) => {
     const order = await store.completeOrder(user.id);
     res.json(order);
   } catch (err) {
-    if (err instanceof Error && (err.message === "User not authenticated" || err.message === "Order ID is undefined")) {
+    if (
+      err instanceof Error &&
+      (err.message === "User not authenticated" ||
+        err.message === "Order ID is undefined")
+    ) {
       res.status(400).json({ error: err.message });
     } else {
-      res.status(500).json({ error: "An unexpected error occurred", details: (err as Error).message });
+      console.error("Error in completeCurrentOrder:", err);
+      res.status(500).json({ error: "An unexpected error occurred" });
     }
   }
 };

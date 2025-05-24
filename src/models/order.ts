@@ -53,7 +53,8 @@ export class OrderStore {
       // Begin transaction
       await conn.query("BEGIN");
       // find the current active order for the user
-      const sql = "SELECT * FROM orders WHERE user_id=($1) AND status=($2) FOR UPDATE";
+      const sql =
+        "SELECT * FROM orders WHERE user_id=($1) AND status=($2) FOR UPDATE";
       const result = await conn.query(sql, [user_id, "active"]);
       const order = result.rows[0];
       if (!order) {
@@ -73,7 +74,7 @@ export class OrderStore {
 
       // Commit transaction
       await conn.query("COMMIT");
-      return {...updatedOrder, totalPrice: total};
+      return { ...updatedOrder, totalPrice: total };
     } catch (err) {
       // Rollback transaction in case of error
       await conn.query("ROLLBACK");
