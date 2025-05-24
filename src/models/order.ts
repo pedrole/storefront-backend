@@ -69,11 +69,11 @@ export class OrderStore {
       const totalPriceSql =
         "SELECT COALESCE(SUM(p.price * op.quantity), 0) AS total_price FROM order_products op JOIN products p ON op.product_id = p.id WHERE op.order_id = $1";
       const totalPriceResult = await conn.query(totalPriceSql, [order.id]);
-      const totalPrice = totalPriceResult.rows[0].total_price;
+      const total = totalPriceResult.rows[0].total_price;
 
       // Commit transaction
       await conn.query("COMMIT");
-      return {...updatedOrder, totalPrice};
+      return {...updatedOrder, totalPrice: total};
     } catch (err) {
       // Rollback transaction in case of error
       await conn.query("ROLLBACK");
