@@ -67,7 +67,7 @@ export class OrderStore {
 
       // calculate total price
       const totalPriceSql =
-        "SELECT SUM(p.price * op.quantity) AS total_price FROM order_products op JOIN products p ON op.product_id = p.id WHERE op.order_id = $1";
+        "SELECT COALESCE(SUM(p.price * op.quantity), 0) AS total_price FROM order_products op JOIN products p ON op.product_id = p.id WHERE op.order_id = $1";
       const totalPriceResult = await conn.query(totalPriceSql, [order.id]);
       const totalPrice = totalPriceResult.rows[0].total_price;
 
