@@ -73,6 +73,7 @@ These are the notes from a meeting with the frontend developer that describe wha
   - `price`
   - `quantity`
   - `image`
+- `total`: total price of all products in the order (returned when order is completed)
 
 #### OrderProduct
 - order_id
@@ -114,4 +115,4 @@ order_products {
 
 - When updating a product's quantity in an order, if the quantity is set to 0 or less, the product will be removed from the order. The API will return a distinct response indicating removal.
 - All order modifications (add/update/remove product) are performed atomically to ensure data consistency.
-- Completing an order will set its status to `complete` and prevent further modifications to that order.
+- Completing an order will set its status to `complete`, return the order with a `total` field, and prevent further modifications to that order.

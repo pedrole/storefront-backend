@@ -53,7 +53,8 @@ export class OrderStore {
       // Begin transaction
       await conn.query("BEGIN");
       // find the current active order for the user
-      const sql = "SELECT * FROM orders WHERE user_id=($1) AND status=($2) FOR UPDATE";
+      const sql =
+        "SELECT * FROM orders WHERE user_id=($1) AND status=($2) FOR UPDATE";
       const result = await conn.query(sql, [user_id, "active"]);
       const order = result.rows[0];
       if (!order) {
@@ -64,9 +65,16 @@ export class OrderStore {
         "UPDATE orders SET status = $1 WHERE id = $2 RETURNING *";
       const updatedResult = await conn.query(updateSql, ["complete", order.id]);
       const updatedOrder = updatedResult.rows[0];
+
+      // calculate total price
+      const totalPriceSql =
+        "SELECT COALESCE(SUM(p.price * op.quantity), 0) AS total_price FROM order_products op JOIN products p ON op.product_id = p.id WHERE op.order_id = $1";
+      const totalPriceResult = await conn.query(totalPriceSql, [order.id]);
+      const total = totalPriceResult.rows[0].total_price;
+
       // Commit transaction
       await conn.query("COMMIT");
-      return updatedOrder;
+      return { ...updatedOrder, totalPrice: total };
     } catch (err) {
       // Rollback transaction in case of error
       await conn.query("ROLLBACK");
