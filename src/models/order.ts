@@ -1,5 +1,6 @@
 import { Connection } from "pg";
 import client from "../database";
+import { parse } from "dotenv";
 
 export type Order = {
   id?: number;
@@ -70,11 +71,15 @@ export class OrderStore {
       const totalPriceSql =
         "SELECT COALESCE(SUM(p.price * op.quantity), 0) AS total_price FROM order_products op JOIN products p ON op.product_id = p.id WHERE op.order_id = $1";
       const totalPriceResult = await conn.query(totalPriceSql, [order.id]);
-      const total = totalPriceResult.rows[0].total_price;
+
+
+      const total = parseFloat(
+        totalPriceResult.rows[0].total_price || "0"
+      );
 
       // Commit transaction
       await conn.query("COMMIT");
-      return { ...updatedOrder, totalPrice: total };
+      return { ...updatedOrder, total };
     } catch (err) {
       // Rollback transaction in case of error
       await conn.query("ROLLBACK");
