@@ -15,9 +15,10 @@
   },
   "prod": {
     "driver": "pg",
-    "host": "localhost",
-    "database": "storefront_prod",
+    "host": "dpg-d1vsr3vgi27c738ii92g-a.frankfurt-postgres.render.com",
+    "database": "storefront_db_zyao",
     "user": "full_stack_user",
-    "password": "password123"
+    "password": "IFofoKrRHNq5EsiJN34oz55Qs6UsRnnJ",
+      "ssl": true
   }
 }

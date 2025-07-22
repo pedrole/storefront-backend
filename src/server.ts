@@ -19,8 +19,9 @@ userRoutes(app)
 productRoutes(app)
 orderRoutes(app)
 
-app.listen(3000, function () {
-    console.log(`starting app on: ${address}`)
-})
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
 
 export default app
