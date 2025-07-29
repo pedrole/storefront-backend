@@ -21,7 +21,8 @@ const seedUsers = async () => {
     }
 
     // Hash password for demo user
-    const hashedPassword = await bcrypt.hash('demo123' + pepper, saltRounds);
+    const demoPassword = process.env.DEMO_USER_PASSWORD || 'demo123';
+    const hashedPassword = await bcrypt.hash(demoPassword + pepper, saltRounds);
 
     // Insert demo users
     const users = [
