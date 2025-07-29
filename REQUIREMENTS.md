@@ -15,13 +15,15 @@ These are the notes from a meeting with the frontend developer that describe wha
 
 #### Users
 - Index [token required]
-  - `/users`
+  - GET `/users`
 - Show [token required]
-  - `/users/:id`
-- Create N[token required]
-  - `/users`
+  - GET `/users/:id`
+- Create [token required]
+  - POST `/users`
+  - Body: `{ firstname, lastname, email, password }`
 - Login
-  - POST `/users/login/`
+  - POST `/users/login`
+  - Body: `{ email, password }`
 
 #### Orders
 - **Current Order by user** (args: user id) [token required]
@@ -61,6 +63,7 @@ These are the notes from a meeting with the frontend developer that describe wha
 - id
 - first_name
 - last_name
+- email
 - password
 
 ### Order

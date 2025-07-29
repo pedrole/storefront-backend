@@ -3,7 +3,6 @@ import client from "../../database";
 
 const store = new UserStore();
 
-
 describe("User Model", () => {
   let userId: number;
   beforeAll(async () => {
@@ -33,16 +32,17 @@ describe("User Model", () => {
   });
 
   it("create method should add a user", async () => {
-    const result  = await store.create({
+    const result = await store.create({
       first_name: "John",
       last_name: "Doe",
+      email: "john.doe@example.com",
       password: "password123",
     });
     userId = result.id as number;
 
-
     expect(result.first_name).toEqual("John");
     expect(result.last_name).toEqual("Doe");
+    expect(result.email).toEqual("john.doe@example.com");
   });
 
   it("index method should return a list of users", async () => {
@@ -54,6 +54,7 @@ describe("User Model", () => {
     const result = await store.show(userId.toString());
     expect(result.first_name).toEqual("John");
     expect(result.last_name).toEqual("Doe");
+    expect(result.email).toEqual("john.doe@example.com");
   });
 
   it("delete method should remove the user", async () => {
@@ -66,9 +67,11 @@ describe("User Model", () => {
     await store.create({
       first_name: "Jane",
       last_name: "Doe",
+      email: "jane.doe@example.com",
       password: "password123",
     });
-    const result = await store.authenticate("Jane", "Doe", "password123");
+    const result = await store.authenticate("jane.doe@example.com", "password123");
     expect(result).not.toBeNull();
+    expect(result?.email).toBe("jane.doe@example.com");
   });
 });

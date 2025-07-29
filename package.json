@@ -8,7 +8,9 @@
     "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess \"node ./dist/server.js\"",
     "test": "npm run test:delete:db ; db-migrate db:create storefront_test ; db-migrate --env test up ; npm run tsc ; ENV=test jasmine-ts ; db-migrate db:drop storefront_test",
     "test:delete:db": "db-migrate db:drop storefront_test",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "seed": "npm run build && node dist/scripts/seed.js",
+    "seed:dev": "ts-node src/scripts/seed.ts"
   },
   "author": "Udacity",
   "license": "ISC",

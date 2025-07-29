@@ -11,6 +11,7 @@ const createUser = async (req: Request, res: Response) => {
     const user: User = {
       first_name: req.body.firstname,
       last_name: req.body.lastname,
+      email: req.body.email,
       password: req.body.password,
     };
 
@@ -28,17 +29,14 @@ const createUser = async (req: Request, res: Response) => {
 // login
 const login = async (req: Request, res: Response) => {
   try {
-    const user: User = {
-      first_name: req.body.firstname,
-      last_name: req.body.lastname,
-      password: req.body.password,
-    };
-    console.log(user);
+    const {email, password} = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
+    }
 
     const loggedInUser = await store.authenticate(
-      user.first_name,
-      user.last_name,
-      user.password
+      email,
+      password
     );
     if (!loggedInUser) {
       return res.status(401).json({ error: "Invalid credentials" });
