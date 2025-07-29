@@ -16,6 +16,7 @@ describe('Users Handler', () => {
     const response = await request.post('/users').send({
       firstname: 'John',
       lastname: 'Doe',
+      email: 'john.doe@example.com',
       password: 'password123'
     });
     token = response.body.token;
@@ -26,11 +27,22 @@ describe('Users Handler', () => {
     const response = await request.post('/users').send({
       firstname: 'Jane',
       lastname: 'Doe',
+      email: 'jane.doe@example.com',
       password: 'password123'
     });
     expect(response.status).toBe(200);
     const decoded = jwt.verify(response.body.token, process.env.TOKEN_SECRET as string);
     expect((decoded as any).user.first_name).toBe('Jane');
+    expect((decoded as any).user.email).toBe('jane.doe@example.com');
+  });
+
+  it('should login with email and password', async () => {
+    const response = await request.post('/users/login').send({
+      email: 'john.doe@example.com',
+      password: 'password123'
+    });
+    expect(response.status).toBe(200);
+    expect(response.body.token).toBeDefined();
   });
 
   it('should return a list of users', async () => {
@@ -43,5 +55,6 @@ describe('Users Handler', () => {
     const response = await request.get(`/users/${userId}`).set('Authorization', `Bearer ${token}`);
     expect(response.status).toBe(200);
     expect(response.body.first_name).toBe('John');
+    expect(response.body.email).toBe('john.doe@example.com');
   });
 });

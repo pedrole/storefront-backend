@@ -19,14 +19,19 @@ yarn install
 ### Set up environment variables
 Create a .env file and add:
 ```env
+# Database
 POSTGRES_HOST=127.0.0.1
 POSTGRES_DB=storefront_dev
 POSTGRES_TEST_DB=storefront_test
 POSTGRES_USER=full_stack_user
 POSTGRES_PASSWORD=your_secret_password
-BCRYPT_PASSWORD=your_secret_salt
+
+# Security
+BCRYPT_PEPPER=your-secret-pepper
 SALT_ROUNDS=10
 TOKEN_SECRET=your_jwt_secret
+
+# Environment
 ENV=dev
 ```
 
@@ -45,7 +50,21 @@ ALTER ROLE full_stack_user CREATEDB;
 yarn db-migrate up
 ```
 
+3. Seed demo users for testing
+```bash
+npm run seed
+```
+
+This creates demo users for immediate testing without manual registration.
+
+## Demo Credentials
+
 ## Running the Application
+
+- **Email**: demo@example.com
+- **Password**: demo123
+
+Perfect for recruiters and testers to quickly access the application!
 
 ### Start the API
 ```sh

@@ -16,6 +16,7 @@ describe('Orders Handler', () => {
     const userResponse = await request.post('/users').send({
       firstname: 'John',
       lastname: 'Doe',
+      email: 'john@example.com',
       password: 'password123'
     });
     token = userResponse.body.token;

@@ -10,8 +10,8 @@ describe('Order Model', () => {
     await conn.query('DELETE FROM orders');
     await conn.query('DELETE FROM users');
     const userResult = await conn.query(
-      'INSERT INTO users (first_name, last_name, password) VALUES ($1, $2, $3) RETURNING id',
-      ['John', 'Doe', 'password123']
+      'INSERT INTO users (first_name, last_name, email, password) VALUES ($1, $2, $3,$4) RETURNING id',
+      ['John', 'Doe', 'john@mail.com','password123']
     );
     userId = userResult.rows[0].id;
     await conn.query('INSERT INTO orders (user_id, status) VALUES ($1, $2)', [userId, 'active']);
