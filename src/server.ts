@@ -27,9 +27,11 @@ const startServer = async () => {
     if (process.env.AUTO_SEED === 'true' || process.env.ENV === 'dev') {
       await initializeDatabase();
     }
+    const port = process.env.PORT || 3000;
+    const host = process.env.HOST || '0.0.0.0';
 
-    app.listen(3000, function () {
-        console.log(`Starting app on: ${address}`);
+    app.listen(port, function () {
+        console.log(`Starting app on: ${host}:${port}`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);
