@@ -5,12 +5,20 @@
   "main": "server.ts",
   "scripts": {
     "start": "node src/server.ts",
+    "build": "tsc",
     "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess \"node ./dist/server.js\"",
     "test": "npm run test:delete:db ; db-migrate db:create storefront_test ; db-migrate --env test up ; npm run tsc ; ENV=test jasmine-ts ; db-migrate db:drop storefront_test",
     "test:delete:db": "db-migrate db:drop storefront_test",
     "tsc": "tsc",
     "seed": "npm run build && node dist/scripts/seed.js",
-    "seed:dev": "ts-node src/scripts/seed.ts"
+    "seed:dev": "ts-node src/scripts/seed.ts",
+    "seed:users": "npm run build && node -e \"require('./dist/scripts/seed.js').seedUsers()\"",
+    "seed:products": "npm run build && node -e \"require('./dist/scripts/seedProducts.js').seedProducts()\"",
+    "setup:dev": "db-migrate up --env dev && npm run seed:dev",
+    "setup:prod": "db-migrate up --env prod && npm run seed",
+    "db:recreate": "db-migrate db:drop storefront_dev && db-migrate db:create storefront_dev && db-migrate up --env dev && npm run seed:dev",
+    "db:recreate:test": "db-migrate db:drop storefront_test && db-migrate db:create storefront_test && db-migrate up --env test",
+    "db:reset": "npm run db:recreate && npm run db:recreate:test"
   },
   "author": "Udacity",
   "license": "ISC",

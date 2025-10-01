@@ -1,5 +1,6 @@
 import client from '../database';
 import bcrypt from 'bcrypt';
+import { seedProducts } from './seedProducts';
 
 const pepper = process.env.BCRYPT_PEPPER || "";
 const saltRounds = parseInt(process.env.SALT_ROUNDS as string) || 10;
@@ -15,7 +16,7 @@ const seedUsers = async () => {
     );
 
     if (existingUser.rows.length > 0) {
-      console.log('Demo user already exists, skipping seed...');
+      console.log('Demo user already exists, skipping user seed...');
       conn.release();
       return;
     }
@@ -55,7 +56,7 @@ const seedUsers = async () => {
     }
 
     conn.release();
-    console.log('🎉 Seed completed successfully!');
+    console.log('🎉 User seed completed successfully!');
 
   } catch (error) {
     console.error('❌ Error seeding users:', error);
@@ -63,9 +64,14 @@ const seedUsers = async () => {
   }
 };
 
-const runSeed = async () => {
+const runAllSeeds = async () => {
   try {
+    console.log('🌱 Starting database seeding...');
+
     await seedUsers();
+    await seedProducts();
+
+    console.log('🎉 All seeds completed successfully!');
     process.exit(0);
   } catch (error) {
     console.error('Failed to seed database:', error);
@@ -75,7 +81,7 @@ const runSeed = async () => {
 
 // Run if this file is executed directly
 if (require.main === module) {
-  runSeed();
+  runAllSeeds();
 }
 
-export { seedUsers };
+export { seedUsers, runAllSeeds };

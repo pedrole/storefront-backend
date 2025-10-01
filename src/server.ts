@@ -1,9 +1,10 @@
-import express, { Request, Response } from 'express'
-import cors from 'cors'
-import bodyParser from 'body-parser'
-import productRoutes from './handlers/products'
-import userRoutes from './handlers/users'
-import orderRoutes from './handlers/orders'
+import express, { Request, Response } from 'express';
+import bodyParser from 'body-parser';
+import productRoutes from './handlers/products';
+import userRoutes from './handlers/users';
+import orderRoutes from './handlers/orders';
+import cors from 'cors';
+import { initializeDatabase } from './scripts/initialize';
 
 const app: express.Application = express()
 const address: string = "0.0.0.0:3000"
@@ -12,16 +13,30 @@ app.use(cors())
 app.use(bodyParser.json())
 
 app.get('/', function (req: Request, res: Response) {
-    res.send('Hello World!')
-})
-
-userRoutes(app)
-productRoutes(app)
-orderRoutes(app)
-
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+    res.send('Hello World!');
 });
 
-export default app
+productRoutes(app);
+userRoutes(app);
+orderRoutes(app);
+
+// Initialize database with seed data on startup
+const startServer = async () => {
+  try {
+    // Run seeds on startup (only in development or if specifically enabled)
+    if (process.env.AUTO_SEED === 'true' || process.env.ENV === 'dev') {
+      await initializeDatabase();
+    }
+
+    app.listen(3000, function () {
+        console.log(`Starting app on: ${address}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
+
+export default app;

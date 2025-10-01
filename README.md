@@ -33,6 +33,10 @@ TOKEN_SECRET=your_jwt_secret
 
 # Environment
 ENV=dev
+AUTO_SEED=false
+
+# Demo User
+DEMO_USER_PASSWORD=demo123
 ```
 
 ### Set up the database
